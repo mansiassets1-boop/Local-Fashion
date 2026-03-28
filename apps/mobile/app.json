@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "LocalFashion Partner",
+    "slug": "local-fashion-partner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#4F46E5"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow LocalFashion to use your location for delivery tracking."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow LocalFashion to access camera for document photos."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#4F46E5"
+        }
+      ]
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#4F46E5"
+      },
+      "package": "com.localfashion.partner"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.localfashion.partner"
+    },
+    "scheme": "local-fashion-partner",
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
