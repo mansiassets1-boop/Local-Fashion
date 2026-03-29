@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, ArrowRight, AlertTriangle } from 'lucide-react';
+import { ShoppingBag, ArrowRight, AlertTriangle, Package } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useAuthStore } from '@/store/auth.store';
 import { CartItemRow } from '@/components/cart/CartItem';
@@ -18,7 +18,6 @@ export default function CartPage() {
   const isAuth = isLoggedIn();
   const hasOOSItems = items.some((item) => !item.in_stock);
 
-  // Group items by store
   const groupedItems = items.reduce<Record<string, typeof items>>((acc, item) => {
     if (!acc[item.store_id]) acc[item.store_id] = [];
     acc[item.store_id].push(item);
@@ -32,67 +31,70 @@ export default function CartPage() {
 
   if (!isAuth) {
     return (
-      <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <ShoppingBag className="h-16 w-16 mx-auto text-gray-200 mb-4" />
-        <h1 className="text-lg font-bold text-gray-900 mb-2">Your cart is waiting</h1>
-        <p className="text-gray-500 text-sm mb-6">
-          Login to view your cart and checkout
-        </p>
-        <Button fullWidth onClick={() => router.push('/login')}>
+      <div className="container-fashion py-20 text-center max-w-sm mx-auto">
+        <div className="w-20 h-20 rounded-full bg-warm-100 flex items-center justify-center mx-auto mb-5">
+          <ShoppingBag className="w-10 h-10 text-warm-400" />
+        </div>
+        <h1 className="font-serif text-2xl font-bold text-warm-900 mb-2">Your cart is waiting</h1>
+        <p className="text-ink-muted text-sm mb-7">Login to view your cart and checkout</p>
+        <button className="btn-brand w-full py-3.5 rounded-xl" onClick={() => router.push('/login')}>
           Login to Continue
-        </Button>
+        </button>
       </div>
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <ShoppingBag className="h-16 w-16 mx-auto text-gray-200 mb-4" />
-        <h1 className="text-lg font-bold text-gray-900 mb-2">Your cart is empty</h1>
-        <p className="text-gray-500 text-sm mb-6">
-          Add items from local stores to get started
+      <div className="container-fashion py-20 text-center max-w-sm mx-auto">
+        <div className="relative inline-block mb-6">
+          <ShoppingBag className="w-20 h-20 text-warm-200" />
+          <span className="absolute bottom-0 right-0 text-3xl">🛍️</span>
+        </div>
+        <h1 className="font-serif text-2xl font-bold text-warm-900 mb-2">Your bag is empty</h1>
+        <p className="text-ink-muted text-sm mb-8">
+          Add items from local boutiques near you and get them delivered in hours.
         </p>
-        <Button fullWidth onClick={() => router.push('/search')}>
+        <button className="btn-brand w-full py-3.5 rounded-xl" onClick={() => router.push('/search')}>
           Start Shopping
-        </Button>
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-      <h1 className="text-xl font-bold text-gray-900 mb-4">
-        My Cart ({items.length} item{items.length !== 1 ? 's' : ''})
-      </h1>
+    <div className="container-fashion py-5 pb-24 md:pb-8">
+      <div className="flex items-baseline gap-3 mb-6">
+        <h1 className="font-serif text-2xl md:text-3xl font-bold text-warm-900">My Bag</h1>
+        <span className="text-ink-muted text-sm">{items.length} item{items.length !== 1 ? 's' : ''}</span>
+      </div>
 
       {hasOOSItems && (
-        <div className="flex items-center gap-2 bg-red-50 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm">
+        <div className="flex items-center gap-2.5 bg-red-50 text-red-700 px-4 py-3 rounded-2xl mb-5 text-sm border border-red-100">
           <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-          <span>Some items are out of stock. Remove them to proceed.</span>
+          <span>Some items are out of stock. Remove them to proceed to checkout.</span>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5">
         {/* Cart items grouped by store */}
         <div className="space-y-4">
           {Object.entries(groupedItems).map(([storeId, storeItems]) => (
-            <div key={storeId} className="bg-white rounded-xl shadow-card overflow-hidden">
+            <div key={storeId} className="bg-white rounded-2xl shadow-warm-sm overflow-hidden">
               {/* Store header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-warm-50">
                 <Link
                   href={`/stores/${storeId}`}
-                  className="text-sm font-semibold text-gray-900 hover:text-primary-600 transition-colors"
+                  className="flex items-center gap-2 text-sm font-semibold text-ink hover:text-brand-600 transition-colors"
                 >
-                  🏪 {storeItems[0].store_name}
+                  <Package className="w-4 h-4 text-brand-500" />
+                  {storeItems[0].store_name}
                 </Link>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-ink-muted">
                   {storeItems.length} item{storeItems.length !== 1 ? 's' : ''}
                 </span>
               </div>
-
-              {/* Items */}
-              <div className="px-4 divide-y divide-gray-50">
+              <div className="px-4 divide-y divide-warm-50">
                 {storeItems.map((item) => (
                   <CartItemRow key={item.variant_id} item={item} />
                 ))}
@@ -101,7 +103,7 @@ export default function CartPage() {
           ))}
         </div>
 
-        {/* Order summary */}
+        {/* Summary + CTA */}
         <div className="space-y-4">
           <CartSummary
             subtotal={subtotal}
@@ -111,22 +113,31 @@ export default function CartPage() {
             savings={savings}
           />
 
-          <Button
-            fullWidth
-            size="lg"
-            rightIcon={<ArrowRight className="h-5 w-5" />}
+          <button
+            className={`btn-brand w-full py-4 rounded-2xl text-base flex items-center justify-center gap-2 ${(hasOOSItems || items.length === 0) ? 'opacity-60 cursor-not-allowed' : ''}`}
             disabled={hasOOSItems || items.length === 0}
             onClick={() => router.push('/checkout')}
           >
             Proceed to Checkout
-          </Button>
+            <ArrowRight className="w-4 h-4" />
+          </button>
 
           <Link
             href="/search"
-            className="block text-center text-sm text-primary-600 hover:text-primary-700 transition-colors"
+            className="block text-center text-sm text-brand-600 hover:text-brand-700 transition-colors font-medium"
           >
             Continue Shopping
           </Link>
+
+          {/* Trust */}
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            {[['🔒', 'Secure checkout'], ['⚡', '2-3 hr delivery']].map(([icon, text]) => (
+              <div key={text} className="flex items-center gap-2 bg-warm-50 rounded-xl px-3 py-2">
+                <span className="text-sm">{icon}</span>
+                <span className="text-[11px] text-ink-muted font-medium">{text}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
