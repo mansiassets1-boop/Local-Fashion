@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -8,42 +8,104 @@ interface Category {
   id: string;
   name: string;
   emoji: string;
-  color?: string;
+  gradient: string;
+  activeGradient: string;
 }
 
 const DEFAULT_CATEGORIES: Category[] = [
-  { id: 'kurtis', name: 'Kurtis', emoji: '👘', color: 'bg-pink-50 text-pink-700' },
-  { id: 'sarees', name: 'Sarees', emoji: '🥻', color: 'bg-purple-50 text-purple-700' },
-  { id: 'tops', name: 'Tops', emoji: '👚', color: 'bg-blue-50 text-blue-700' },
-  { id: 'dresses', name: 'Dresses', emoji: '👗', color: 'bg-rose-50 text-rose-700' },
-  { id: 'jeans', name: 'Jeans', emoji: '👖', color: 'bg-indigo-50 text-indigo-700' },
-  { id: 'heels', name: 'Heels', emoji: '👠', color: 'bg-orange-50 text-orange-700' },
-  { id: 'bags', name: 'Bags', emoji: '👜', color: 'bg-amber-50 text-amber-700' },
-  { id: 'jewellery', name: 'Jewellery', emoji: '💍', color: 'bg-yellow-50 text-yellow-700' },
-  { id: 'lehengas', name: 'Lehengas', emoji: '🪷', color: 'bg-fuchsia-50 text-fuchsia-700' },
-  { id: 'dupattas', name: 'Dupattas', emoji: '🧣', color: 'bg-teal-50 text-teal-700' },
+  {
+    id: 'kurtis',
+    name: 'Kurtis',
+    emoji: '👗',
+    gradient: 'bg-gradient-to-br from-rose-50 to-pink-100 text-rose-700 border-rose-100',
+    activeGradient: 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-600 shadow-warm-md',
+  },
+  {
+    id: 'sarees',
+    name: 'Sarees',
+    emoji: '🥻',
+    gradient: 'bg-gradient-to-br from-purple-50 to-fuchsia-100 text-purple-700 border-purple-100',
+    activeGradient: 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-600 shadow-warm-md',
+  },
+  {
+    id: 'lehengas',
+    name: 'Lehengas',
+    emoji: '👑',
+    gradient: 'bg-gradient-to-br from-amber-50 to-yellow-100 text-amber-700 border-amber-100',
+    activeGradient: 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-600 shadow-warm-md',
+  },
+  {
+    id: 'heels',
+    name: 'Heels',
+    emoji: '👠',
+    gradient: 'bg-gradient-to-br from-orange-50 to-warm-100 text-orange-700 border-orange-100',
+    activeGradient: 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-600 shadow-warm-md',
+  },
+  {
+    id: 'bags',
+    name: 'Bags',
+    emoji: '👜',
+    gradient: 'bg-gradient-to-br from-warm-100 to-warm-200 text-warm-800 border-warm-200',
+    activeGradient: 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-600 shadow-warm-md',
+  },
+  {
+    id: 'jewellery',
+    name: 'Jewellery',
+    emoji: '💍',
+    gradient: 'bg-gradient-to-br from-yellow-50 to-gold-100 text-gold-700 border-yellow-100',
+    activeGradient: 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-600 shadow-warm-md',
+  },
+  {
+    id: 'dupattas',
+    name: 'Dupattas',
+    emoji: '🧣',
+    gradient: 'bg-gradient-to-br from-teal-50 to-cyan-100 text-teal-700 border-teal-100',
+    activeGradient: 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-600 shadow-warm-md',
+  },
+  {
+    id: 'mens',
+    name: "Men's",
+    emoji: '👔',
+    gradient: 'bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-700 border-blue-100',
+    activeGradient: 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-600 shadow-warm-md',
+  },
+  {
+    id: 'new-in',
+    name: 'New In',
+    emoji: '🌸',
+    gradient: 'bg-gradient-to-br from-pink-50 to-rose-100 text-pink-700 border-pink-100',
+    activeGradient: 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-600 shadow-warm-md',
+  },
 ];
 
 interface CategoryChipsProps {
   categories?: Category[];
+  activeId?: string;
 }
 
-export function CategoryChips({ categories = DEFAULT_CATEGORIES }: CategoryChipsProps) {
+export function CategoryChips({ categories = DEFAULT_CATEGORIES, activeId }: CategoryChipsProps) {
+  const [active, setActive] = useState<string | null>(activeId || null);
+
   return (
-    <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
-      {categories.map((cat) => (
-        <Link
-          key={cat.id}
-          href={`/search?category=${cat.id}`}
-          className={cn(
-            'flex-shrink-0 flex flex-col items-center gap-1.5 rounded-2xl px-4 py-3 transition-all hover:scale-105',
-            cat.color || 'bg-gray-50 text-gray-700'
-          )}
-        >
-          <span className="text-2xl leading-none">{cat.emoji}</span>
-          <span className="text-xs font-medium whitespace-nowrap">{cat.name}</span>
-        </Link>
-      ))}
+    <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4 sm:-mx-6 sm:px-6">
+      {categories.map((cat) => {
+        const isActive = active === cat.id;
+        return (
+          <Link
+            key={cat.id}
+            href={`/search?category=${cat.id}`}
+            onClick={() => setActive(cat.id)}
+            className={cn(
+              'flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full border font-medium text-sm',
+              'transition-all duration-200 hover:scale-105 hover:-translate-y-0.5',
+              isActive ? cat.activeGradient : cat.gradient
+            )}
+          >
+            <span className="text-base leading-none">{cat.emoji}</span>
+            <span className="whitespace-nowrap tracking-tight">{cat.name}</span>
+          </Link>
+        );
+      })}
     </div>
   );
 }

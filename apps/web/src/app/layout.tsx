@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display, Cormorant_Garamond } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import { Providers } from './providers';
 import { Header } from '@/components/layout/Header';
@@ -11,6 +11,23 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  variable: '--font-cormorant',
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
+  style: ['normal', 'italic'],
 });
 
 export const metadata: Metadata = {
@@ -26,29 +43,58 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="min-h-screen bg-gray-50 font-sans antialiased">
+    <html
+      lang="en"
+      className={`${inter.variable} ${playfair.variable} ${cormorant.variable}`}
+    >
+      <body className="min-h-screen bg-[#faf7f2] font-sans antialiased">
         <Providers>
+          {/* Delivery announcement strip — marquee */}
+          <div className="delivery-strip overflow-hidden">
+            <div className="marquee-container">
+              <div className="flex animate-marquee whitespace-nowrap gap-0">
+                {[0, 1].map((idx) => (
+                  <span key={idx} className="flex items-center gap-8 px-4">
+                    <span>⚡ 2-3 Hour Delivery Now Live in Your City</span>
+                    <span className="opacity-60">·</span>
+                    <span>Free Delivery Above ₹499</span>
+                    <span className="opacity-60">·</span>
+                    <span>🏪 500+ Local Boutiques</span>
+                    <span className="opacity-60">·</span>
+                    <span>✨ Curated Fashion</span>
+                    <span className="opacity-60">·</span>
+                    <span>🔄 7-Day Easy Returns</span>
+                    <span className="opacity-60">·</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <Header />
-          <main className="pb-16 sm:pb-0 min-h-[calc(100vh-4rem)]">
+
+          <main className="pb-16 sm:pb-0 min-h-[calc(100vh-var(--header-h))]">
             {children}
           </main>
+
           <Footer />
           <BottomNav />
+
           <Toaster
             position="top-center"
             toastOptions={{
               className: 'text-sm font-medium',
               style: {
                 borderRadius: '12px',
-                background: '#1f2937',
-                color: '#fff',
+                background: '#1c1410',
+                color: '#faf7f2',
+                border: '1px solid rgba(200,185,158,0.2)',
               },
               success: {
-                iconTheme: { primary: '#4ade80', secondary: '#fff' },
+                iconTheme: { primary: '#16a34a', secondary: '#faf7f2' },
               },
               error: {
-                iconTheme: { primary: '#f87171', secondary: '#fff' },
+                iconTheme: { primary: '#c8532a', secondary: '#faf7f2' },
               },
             }}
           />
