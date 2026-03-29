@@ -91,22 +91,25 @@ export default function SearchPage() {
   ).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-      {/* Search bar (mobile) */}
+    <div className="container-fashion py-4 pb-20 sm:pb-6">
+      {/* Breadcrumb */}
+      <div className="text-xs text-ink-muted mb-4 flex items-center gap-1.5">
+        <span>Home</span> <span className="text-warm-300">/</span>
+        <span className="text-ink font-medium">{debouncedSearch ? `"${debouncedSearch}"` : 'All Products'}</span>
+      </div>
+
+      {/* Mobile search bar */}
       <div className="relative mb-4 sm:hidden">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
         <input
           type="search"
-          placeholder="Search fashion..."
+          placeholder="Search kurtis, sarees, heels..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full pl-9 pr-10 py-2.5 rounded-xl bg-white border border-gray-200 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          className="input-warm w-full pl-9 pr-10"
         />
         {searchInput && (
-          <button
-            onClick={() => setSearchInput('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={() => setSearchInput('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink">
             <X className="h-4 w-4" />
           </button>
         )}
@@ -115,88 +118,71 @@ export default function SearchPage() {
       <div className="flex gap-6">
         {/* Desktop filter sidebar */}
         <aside className="hidden lg:block w-64 flex-shrink-0">
-          <div className="sticky top-20 bg-white rounded-xl shadow-card p-4">
-            <FilterSidebar
-              filters={filters}
-              onFiltersChange={updateFilters}
-            />
+          <div className="sticky bg-white rounded-2xl shadow-warm p-5" style={{ top: 'calc(var(--header-h, 72px) + 80px)' }}>
+            <FilterSidebar filters={filters} onFiltersChange={updateFilters} />
           </div>
         </aside>
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
           {/* Header row */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 gap-3">
             <div>
-              {debouncedSearch && (
-                <h1 className="text-base font-semibold text-gray-900">
-                  Results for &ldquo;{debouncedSearch}&rdquo;
+              {debouncedSearch ? (
+                <h1 className="font-serif text-xl font-bold text-warm-900">
+                  Results for &ldquo;<span className="text-brand-600">{debouncedSearch}</span>&rdquo;
                 </h1>
+              ) : (
+                <h1 className="font-serif text-xl font-bold text-warm-900">All Products</h1>
               )}
-              {!isLoading && (
-                <p className="text-sm text-gray-400">
-                  {totalCount.toLocaleString()} product{totalCount !== 1 ? 's' : ''} found
-                </p>
+              {!isLoading ? (
+                <p className="text-sm text-ink-muted mt-0.5">{totalCount.toLocaleString()} items found</p>
+              ) : (
+                <Skeleton className="h-4 w-28 mt-1" />
               )}
-              {isLoading && <Skeleton className="h-4 w-32" />}
             </div>
 
-            {/* Filter button - mobile/tablet */}
-            <Button
-              variant="outline"
-              size="sm"
-              leftIcon={<SlidersHorizontal className="h-4 w-4" />}
-              onClick={() => setFilterDrawerOpen(true)}
-              className="lg:hidden"
-            >
-              Filters
-              {activeFilterCount > 0 && (
-                <span className="ml-1 bg-primary-600 text-white text-[10px] font-bold h-4 w-4 rounded-full inline-flex items-center justify-center">
-                  {activeFilterCount}
-                </span>
-              )}
-            </Button>
+            {/* Filter + sort buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setFilterDrawerOpen(true)}
+                className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-warm-200 text-sm font-medium text-ink hover:border-brand-400 transition-colors shadow-warm-sm"
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                Filters
+                {activeFilterCount > 0 && (
+                  <span className="bg-brand-600 text-white text-[10px] font-bold h-4 min-w-[16px] rounded-full inline-flex items-center justify-center px-1">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Active filter chips */}
           {activeFilterCount > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {filters.category && (
-                <FilterChip
-                  label={`Category: ${filters.category}`}
-                  onRemove={() => updateFilters({ ...filters, category: undefined })}
-                />
+                <FilterChip label={`Category: ${filters.category}`} onRemove={() => updateFilters({ ...filters, category: undefined })} />
               )}
               {filters.size && (
-                <FilterChip
-                  label={`Size: ${filters.size}`}
-                  onRemove={() => updateFilters({ ...filters, size: undefined })}
-                />
+                <FilterChip label={`Size: ${filters.size}`} onRemove={() => updateFilters({ ...filters, size: undefined })} />
               )}
               {filters.color && (
-                <FilterChip
-                  label={`Color: ${filters.color}`}
-                  onRemove={() => updateFilters({ ...filters, color: undefined })}
-                />
+                <FilterChip label={`Color: ${filters.color}`} onRemove={() => updateFilters({ ...filters, color: undefined })} />
               )}
               {(filters.min_price || filters.max_price) && (
-                <FilterChip
-                  label={`₹${filters.min_price || 0} – ₹${filters.max_price || '∞'}`}
-                  onRemove={() => updateFilters({ ...filters, min_price: undefined, max_price: undefined })}
-                />
+                <FilterChip label={`₹${filters.min_price || 0} – ₹${filters.max_price || '∞'}`} onRemove={() => updateFilters({ ...filters, min_price: undefined, max_price: undefined })} />
               )}
               {filters.min_rating && (
-                <FilterChip
-                  label={`${filters.min_rating}+ stars`}
-                  onRemove={() => updateFilters({ ...filters, min_rating: undefined })}
-                />
+                <FilterChip label={`${filters.min_rating}★ & above`} onRemove={() => updateFilters({ ...filters, min_rating: undefined })} />
               )}
               {filters.sort && (
-                <FilterChip
-                  label={`Sort: ${filters.sort.replace('_', ' ')}`}
-                  onRemove={() => updateFilters({ ...filters, sort: undefined })}
-                />
+                <FilterChip label={`Sort: ${filters.sort.replace(/_/g, ' ')}`} onRemove={() => updateFilters({ ...filters, sort: undefined })} />
               )}
+              <button onClick={() => updateFilters({})} className="text-xs text-brand-600 underline hover:text-brand-700 font-medium px-1">
+                Clear all
+              </button>
             </div>
           )}
 
@@ -204,23 +190,15 @@ export default function SearchPage() {
           <ProductGrid
             products={products}
             isLoading={isLoading}
-            emptyMessage={
-              debouncedSearch
-                ? `No products found for "${debouncedSearch}". Try a different search.`
-                : 'No products match your filters.'
-            }
+            emptyMessage={debouncedSearch ? `No results for "${debouncedSearch}". Try different keywords.` : 'No products match your filters.'}
           />
 
-          {/* Load more trigger */}
-          <div ref={loadMoreRef} className="h-8 flex items-center justify-center mt-4">
+          {/* Load more sentinel */}
+          <div ref={loadMoreRef} className="h-12 flex items-center justify-center mt-4">
             {isFetchingNextPage && (
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="h-2 w-2 rounded-full bg-primary-400 animate-bounce"
-                    style={{ animationDelay: `${i * 0.1}s` }}
-                  />
+                  <div key={i} className="h-2 w-2 rounded-full bg-brand-400 animate-bounce" style={{ animationDelay: `${i * 0.12}s` }} />
                 ))}
               </div>
             )}
@@ -229,18 +207,9 @@ export default function SearchPage() {
       </div>
 
       {/* Mobile filter drawer */}
-      <Modal
-        open={filterDrawerOpen}
-        onClose={() => setFilterDrawerOpen(false)}
-        size="full"
-      >
-        <div className="h-[80vh] flex flex-col">
-          <FilterSidebar
-            filters={filters}
-            onFiltersChange={(f) => { updateFilters(f); }}
-            onClose={() => setFilterDrawerOpen(false)}
-            isMobile
-          />
+      <Modal open={filterDrawerOpen} onClose={() => setFilterDrawerOpen(false)} size="full">
+        <div className="h-[85vh] flex flex-col">
+          <FilterSidebar filters={filters} onFiltersChange={(f) => { updateFilters(f); }} onClose={() => setFilterDrawerOpen(false)} isMobile />
         </div>
       </Modal>
     </div>
@@ -249,9 +218,9 @@ export default function SearchPage() {
 
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="flex items-center gap-1 bg-primary-50 text-primary-700 text-xs font-medium px-2.5 py-1 rounded-full">
+    <span className="flex items-center gap-1 bg-brand-50 text-brand-700 text-xs font-medium px-3 py-1.5 rounded-full border border-brand-100">
       {label}
-      <button onClick={onRemove} className="hover:text-primary-900 ml-0.5">
+      <button onClick={onRemove} className="hover:text-brand-900 ml-0.5">
         <X className="h-3 w-3" />
       </button>
     </span>

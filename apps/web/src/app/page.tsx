@@ -1,53 +1,34 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/auth.store';
 import { useDetectCity } from '@/hooks/useCity';
 import { HeroBanner } from '@/components/home/HeroBanner';
 import { CategoryChips } from '@/components/home/CategoryChips';
+import { TrendingCollections } from '@/components/home/TrendingCollections';
+import { ShopTheLook } from '@/components/home/ShopTheLook';
+import { VideoReels } from '@/components/home/VideoReels';
 import { SectionTitle } from '@/components/home/SectionTitle';
 import { ProductGrid } from '@/components/product/ProductGrid';
 import { StoreCard, Store } from '@/components/store/StoreCard';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Product } from '@/hooks/useProducts';
+import { MapPin, Zap } from 'lucide-react';
 
 interface HomeData {
-  banners: {
-    id: string;
-    image_url: string;
-    title?: string;
-    subtitle?: string;
-    cta_label?: string;
-    cta_url?: string;
-    bg_color?: string;
-  }[];
+  banners: any[];
   trending: Product[];
   new_arrivals: Product[];
   nearby_stores: Store[];
 }
 
-// Fallback banners for when API is unavailable
-const FALLBACK_BANNERS = [
-  {
-    id: '1',
-    image_url: '',
-    title: 'New Season Arrivals',
-    subtitle: 'Fresh styles from your local boutiques',
-    cta_label: 'Shop Now',
-    cta_url: '/search',
-    bg_color: '#EEF2FF',
-  },
-  {
-    id: '2',
-    image_url: '',
-    title: '2–3 Hour Delivery',
-    subtitle: 'Get fashion delivered from stores near you',
-    cta_label: 'Explore',
-    cta_url: '/search?sort=popular',
-    bg_color: '#FDF2F8',
-  },
+const WHY_US = [
+  { icon: '⚡', title: '2-3 Hour Delivery', desc: 'From local store to your door in hours, not days' },
+  { icon: '🏪', title: 'Local Boutiques', desc: '500+ curated stores from your own city' },
+  { icon: '🔄', title: 'Easy Returns', desc: '7-day hassle-free return policy' },
+  { icon: '🔒', title: 'Secure Payments', desc: 'UPI, cards, wallets — all encrypted' },
 ];
 
 export default function HomePage() {
@@ -57,100 +38,97 @@ export default function HomePage() {
   const { data, isLoading } = useQuery({
     queryKey: ['home', city?.id],
     queryFn: async () => {
-      const { data } = await api.get<HomeData>('/home', {
-        params: { city_id: city?.id },
-      });
+      const { data } = await api.get<HomeData>('/home', { params: { city_id: city?.id } });
       return data;
     },
     enabled: !!city?.id,
   });
 
-  const banners = data?.banners || FALLBACK_BANNERS;
-  const trending = data?.trending || [];
+  const trending   = data?.trending    || [];
   const newArrivals = data?.new_arrivals || [];
   const nearbyStores = data?.nearby_stores || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-8">
-      {/* Hero Banner */}
-      <section>
-        {banners.length > 0 ? (
-          <HeroBanner banners={banners} />
-        ) : (
-          <Skeleton className="aspect-[2.4/1] sm:aspect-[3/1] rounded-2xl" />
-        )}
+    <div className="pb-20 sm:pb-0">
+
+      {/* ── Hero ──────────────────────────────────────────────────────── */}
+      <section className="container-fashion pt-4 md:pt-6">
+        <HeroBanner banners={data?.banners} />
       </section>
 
-      {/* Category chips */}
-      <section>
+      {/* ── Category chips ────────────────────────────────────────────── */}
+      <section className="container-fashion mt-6">
         <CategoryChips />
       </section>
 
-      {/* Trending Now */}
-      <section>
-        <SectionTitle
-          title="Trending Now"
-          subtitle="Most loved by shoppers in your city"
-          seeAllHref="/search?sort=popular"
-        />
-        <ProductGrid
-          products={trending}
-          isLoading={isLoading && !data}
-          skeletonCount={8}
-          emptyMessage="Trending products will appear here once your city is selected."
-        />
+      {/* ── Trending Collections grid ─────────────────────────────────── */}
+      <section className="container-fashion mt-12">
+        <TrendingCollections />
       </section>
 
-      {/* New Arrivals */}
-      {(newArrivals.length > 0 || isLoading) && (
-        <section>
-          <SectionTitle
-            title="New Arrivals"
-            subtitle="Fresh picks just landed"
-            seeAllHref="/search?sort=newest"
-          />
-          <ProductGrid
-            products={newArrivals}
-            isLoading={isLoading && !data}
-            skeletonCount={4}
-          />
-        </section>
-      )}
+      {/* ── Trending Products ─────────────────────────────────────────── */}
+      <section className="container-fashion mt-14">
+        <SectionTitle title="What's Hot Right Now" subtitle="Trending this week" seeAllHref="/search?sort=sold_count" />
+        <ProductGrid products={trending} isLoading={isLoading && !data} skeletonCount={8} />
+        {!city && !isLoading && (
+          <div className="text-center py-14 bg-warm-50 rounded-3xl">
+            <MapPin className="w-10 h-10 text-brand-400 mx-auto mb-3" />
+            <h3 className="font-serif text-xl font-bold text-warm-900 mb-1">Select your city</h3>
+            <p className="text-sm text-ink-muted">We&apos;ll show trending styles from stores near you</p>
+          </div>
+        )}
+      </section>
 
-      {/* Nearby Stores */}
+      {/* ── Shop the Look ─────────────────────────────────────────────── */}
+      <section className="container-fashion mt-16">
+        <ShopTheLook />
+      </section>
+
+      {/* ── New Arrivals ──────────────────────────────────────────────── */}
+      <section className="container-fashion mt-14">
+        <SectionTitle title="Just Dropped" subtitle="New arrivals this week" seeAllHref="/search?sort=newest" />
+        <ProductGrid products={newArrivals} isLoading={isLoading && !data} skeletonCount={4} />
+      </section>
+
+      {/* ── Video Reels ───────────────────────────────────────────────── */}
+      <section className="container-fashion mt-16">
+        <VideoReels />
+      </section>
+
+      {/* ── Nearby Stores ─────────────────────────────────────────────── */}
       {(nearbyStores.length > 0 || isLoading) && (
-        <section className="pb-4">
-          <SectionTitle
-            title="Shops Near You"
-            subtitle="Boutiques in your neighbourhood"
-            seeAllHref="/search?tab=stores"
-          />
+        <section className="container-fashion mt-14">
+          <SectionTitle title="Stores Near You" subtitle="Local boutiques in your city" seeAllHref="/search?view=stores" />
           {isLoading && !data ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-20 rounded-xl" />
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {nearbyStores.map((store) => (
-                <StoreCard key={store.id} store={store} variant="mini" />
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {nearbyStores.map((store) => <StoreCard key={store.id} store={store} variant="mini" />)}
             </div>
           )}
         </section>
       )}
 
-      {/* No city selected */}
-      {!city && !isLoading && (
-        <div className="text-center py-16">
-          <span className="text-5xl mb-4 block">📍</span>
-          <h2 className="text-lg font-bold text-gray-900 mb-2">Select your city to get started</h2>
-          <p className="text-gray-500 text-sm">
-            We&apos;ll show you fashion from local stores near you
-          </p>
+      {/* ── Why LocalFashion ──────────────────────────────────────────── */}
+      <section className="container-fashion mt-16 mb-8">
+        <div className="bg-warm-900 rounded-3xl p-8 md:p-12">
+          <div className="text-center mb-10">
+            <p className="text-xs font-bold tracking-[0.2em] text-brand-400 uppercase mb-2">Why Choose Us</p>
+            <h2 className="font-serif text-2xl md:text-3xl font-bold text-white">Fashion, delivered differently</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {WHY_US.map((item) => (
+              <div key={item.title} className="text-center">
+                <span className="text-3xl block mb-3">{item.icon}</span>
+                <h3 className="font-semibold text-white text-sm mb-1">{item.title}</h3>
+                <p className="text-warm-500 text-xs leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      )}
+      </section>
     </div>
   );
 }
